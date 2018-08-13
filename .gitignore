@@ -1,0 +1,10 @@
+# everything
+*
+
+# except
+!.gitignore
+!package.json
+!gulpfile.js
+!README.md
+!*.sh
+!yarn.lock
