@@ -5,11 +5,11 @@ Workflow para desenvolvimento de temas
 
 
 Pré-requisitos: NodeJS e NPM
-
-git clone https://github.com/tray-desenvolvedores/workflow.git
-cd workflow
-npm install
-
+```
+$ git clone https://github.com/tray-desenvolvedores/workflow.git
+$ cd workflow
+$ npm install
+```
 # Configuração/Uso
 
 Configure a loja que você vai trabalhar:
