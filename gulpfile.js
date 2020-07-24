@@ -1,19 +1,11 @@
-'use strict';
-
-var gulp = require('gulp');
-var util = require('gulp-util');
-var fs = require('fs');
-var sass = require('gulp-sass');
+var gulp = require("gulp");
+var sass = require("gulp-sass");
 var concat = require('gulp-concat');
-var minifyCSS = require('gulp-minify-css');
+var minifyCSS = require('gulp-cssmin');
+var spawn = require('cross-spawn');
 var uglify = require('gulp-uglify');
-var yaml = require('js-yaml');
-var process = require('process');
-var spawn = require('cross-spawn-async');
+const alert = require('ansi-colors');
 
-/**
- * Get CLI args
- */
 var FOLDER;
 for (var i = process.argv.length; i > 0; i--) {
     var arg = process.argv[i];
@@ -24,53 +16,27 @@ for (var i = process.argv.length; i > 0; i--) {
     }
 }
 
-if (!FOLDER) {
-    var example = 'gulp --folder opencode.commercesuite.com.br';
-    util.log(util.colors.red('Error: missing param: --folder, ex: ' + example));
-    process.exit(1);
-}
-
-/**
- * Get OpenCode config file
- */
-var configYML = FOLDER + '/config.yml';
-var configOpenCode = yaml.safeLoad(fs.readFileSync(configYML, 'utf8'));
-const URL = configOpenCode[':preview_url'];
-
-if (!URL) {
-    util.log(util.colors.red('Error: Did you configured opencode? Check your file: ' + configYML));
-    process.exit(1);
-}
-
-const CSSPATH = FOLDER + '/css/';
 const JSPATH = FOLDER + '/js/';
-const IMGPATH = FOLDER + '/img/';
-const autoprefixer = require('gulp-autoprefixer');
-
-gulp.task('sass', () => {
-  gulp.src(CSSPATH + 'sass/theme.min.scss')
-    .pipe(sass({errLogToConsole: true}))
-    .on('error', util.log)
-    .pipe(concat('theme.min.css'))
-    .pipe(autoprefixer())
-    .pipe(minifyCSS())
-    .pipe(gulp.dest(CSSPATH));
-});
-
+const CSSPATH = FOLDER + '/css/';
 
 
 gulp.task('js', () => {
-  gulp.src(JSPATH + "modules/*.js")
+    gulp.src(JSPATH + "modules/*.js")
     .pipe(concat("theme.min.js"))
     .pipe(uglify({"compress": false}))
     .pipe(gulp.dest(JSPATH));
 });
 
-var imageFiles = [
-    IMGPATH + '**/*.{png,jpg,gif,svg}',
-    '!'+ IMGPATH + 'dist/*'
-];
 
+gulp.task('sass', function() { 
+    gulp
+    .src(CSSPATH + 'sass/theme.min.scss')
+    .pipe(sass())
+    .pipe(concat('theme.min.css'))
+    .on("error", sass.logError)
+    .pipe(minifyCSS())
+    .pipe(gulp.dest(CSSPATH))
+})
 
 gulp.task('opencode', () => {
     process.chdir(FOLDER);
@@ -78,26 +44,21 @@ gulp.task('opencode', () => {
     var opencode = spawn('opencode', ['watch']);
 
     opencode.stdout.on('data', (data) => {
-        var output = util.colors.green(data);
+        var output = alert.green(data);
         if (data.indexOf('Error') > -1) {
-            output = util.colors.bgRed(data);
+            output = alert.red(data);
         }
         process.stdout.write(output);
     });
 
     opencode.stderr.on('data', (data) => {
-        process.stdout.write(util.colors.bgRed(data));
+        process.stdout.write(alert.red(data));
     });
 });
 
 gulp.task('watch', () => {
-    gulp.watch(CSSPATH + 'sass/*', ['sass']);
-    gulp.watch(JSPATH + 'modules/*.js', ['js']);
+    gulp.watch(CSSPATH + 'sass/*', gulp.series('sass'));
+    gulp.watch(JSPATH + 'modules/*.js', gulp.series('js'));
 });
 
-gulp.task('default', [
-    'watch',
-    'opencode',
-    'sass',
-    'js',
- ]);
+gulp.task('default', gulp.parallel('watch', 'opencode', 'sass','js' ));
