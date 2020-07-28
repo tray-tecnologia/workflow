@@ -20,15 +20,16 @@ const JSPATH = FOLDER + '/js/';
 const CSSPATH = FOLDER + '/css/';
 
 
-gulp.task('js', () => {
+gulp.task('js', (done) => {
     gulp.src(JSPATH + "modules/*.js")
     .pipe(concat("theme.min.js"))
     .pipe(uglify({"compress": false}))
     .pipe(gulp.dest(JSPATH));
+    done()
 });
 
 
-gulp.task('sass', function() { 
+gulp.task('sass', function(done) { 
     gulp
     .src(CSSPATH + 'sass/theme.min.scss')
     .pipe(sass())
@@ -36,6 +37,7 @@ gulp.task('sass', function() {
     .on("error", sass.logError)
     .pipe(minifyCSS())
     .pipe(gulp.dest(CSSPATH))
+    done()
 })
 
 gulp.task('opencode', () => {
