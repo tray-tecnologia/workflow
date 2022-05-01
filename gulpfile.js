@@ -20,6 +20,15 @@ const api = new Tray({
 const JSPATH = './js/';
 const CSSPATH = './css/';
 
+const FILES_TO_UPLOAD = [
+    './css/**/*',
+    './js/**/*',
+    './elements/**/*',
+    './layouts/**/*',
+    './pages/**/*',
+    './configs/**/*',
+    './img/**/*',
+]
 
 gulp.task('js', (done) => {
     gulp.src(JSPATH + "modules/*.js")
