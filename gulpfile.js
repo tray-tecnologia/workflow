@@ -20,6 +20,7 @@ const PARAMS = {
     file: (args.match(/--file(=|\s)?([\d\w\.\-\/]+)( --)?/)||[])[2] || '',
 }
 
+    key: PARAMS.tray_api_key || process.env.TRAY_API_KEY,
     debug: false,
 });
 
