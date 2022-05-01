@@ -83,6 +83,7 @@ const remove = file => {
 
 gulp.task('watch', () => {
     gulp.watch(FILES_TO_UPLOAD).on('change', upload);
+    gulp.watch(FILES_TO_UPLOAD).on('add', upload);
     gulp.watch(FILES_TO_UPLOAD).on('unlink', remove);
     gulp.watch(CSSPATH + 'sass/*', gulp.series('sass'));
     gulp.watch(JSPATH + 'modules/*.js', gulp.series('js'));
