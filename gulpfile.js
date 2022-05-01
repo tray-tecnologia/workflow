@@ -86,3 +86,5 @@ gulp.task('download', cb => {
         cb();
     }).catch(() => cb())
 });
+
+gulp.task('default', gulp.parallel('watch', 'sass','js' ));
