@@ -50,25 +50,24 @@ gulp.task('sass', function(done) {
     done()
 })
 
-gulp.task('opencode', () => {
-    process.chdir(FOLDER);
-
-    var opencode = spawn('opencode', ['watch']);
-
-    opencode.stdout.on('data', (data) => {
-        var output = alert.green(data);
-        if (data.indexOf('Error') > -1) {
-            output = alert.red(data);
+const upload = file => {
+    console.log('Uploading:', file)
+    api.upload([
+        file
+    ]).then(res => {
+        if(res.succeed) {
+            console.log(alert.green(`File ${file} has been uploaded`))
         }
-        process.stdout.write(output);
-    });
-
-    opencode.stderr.on('data', (data) => {
-        process.stdout.write(alert.red(data));
-    });
-});
+        else {
+            res.fails.forEach(fail => {
+                console.log(alert.red(`File ${fail.file} not uploaded ${fail.error}`))
+            })
+        }
+    })
+}
 
 gulp.task('watch', () => {
+    gulp.watch(FILES_TO_UPLOAD).on('change', upload);
     gulp.watch(CSSPATH + 'sass/*', gulp.series('sass'));
     gulp.watch(JSPATH + 'modules/*.js', gulp.series('js'));
 });
