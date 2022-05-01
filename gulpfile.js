@@ -72,4 +72,17 @@ gulp.task('watch', () => {
     gulp.watch(JSPATH + 'modules/*.js', gulp.series('js'));
 });
 
-gulp.task('default', gulp.parallel('watch', 'opencode', 'sass','js' ));
+gulp.task('download', cb => {
+    console.log(alert.green('Starting downloading theme files...'))
+    api.download().then(res => {
+        if(res.succeed) {
+            console.log(alert.green(`Done download theme files!`))
+        }
+        else {
+            res.fails.forEach(fail => {
+                console.log(alert.red(`Error download ${fail.file}: ${fail.error}`))
+            })
+        }
+        cb();
+    }).catch(() => cb())
+});
