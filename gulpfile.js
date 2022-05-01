@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+var fs = require('fs');
 var gulp = require("gulp");
 var sass = require("gulp-sass")(require("sass"));
 var concat = require('gulp-concat');
