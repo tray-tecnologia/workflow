@@ -18,6 +18,10 @@ $ npm install
 
 Clone o repositorio, renomeie o arquivo .env.sample para .env e insira as credenciais da API nele.
 
+TRAY_API_KEY=
+TRAY_API_PASSWORD=
+TRAY_THEME_ID=
+
 Obs: API_KEY e PASSWORD são chaves individuais que o desenvolvedor deve solicitar ao lojista.
 
 Em seguida basta executar, para baixar os arquivos do tema:
