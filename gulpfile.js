@@ -29,15 +29,7 @@ const CONFIG = {
 
 const api = new Tray(CONFIG);
 
-const FILES_TO_UPLOAD = [
-    './css/**/*',
-    './js/**/*',
-    './elements/**/*',
-    './layouts/**/*',
-    './pages/**/*',
-    './configs/**/*',
-    './img/**/*',
-]
+const FOLDER = PARAMS.folder || `theme-${CONFIG.themeId}`
 
 gulp.task('js', (done) => {
     gulp.src(JSPATH + "modules/*.js")
