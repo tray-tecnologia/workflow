@@ -10,10 +10,8 @@ const alert = require('ansi-colors');
 
 const Tray = require('@tray-tecnologia/tray-cli').default;
 
-const api = new Tray({
-    key: process.env.TRAY_API_KEY,
-    password: process.env.TRAY_API_PASSWORD,
-    themeId: process.env.TRAY_THEME_ID,
+var args = process.argv.join(' ')
+
     debug: false,
 });
 
