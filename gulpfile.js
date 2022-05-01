@@ -37,24 +37,24 @@ if (!fs.existsSync(FOLDER)){
 
 process.chdir(FOLDER);
 
-gulp.task('sass', function(done) { 
-    gulp
-    .src(CSSPATH + 'sass/theme.min.scss')
-    .pipe(sass())
-    .pipe(concat('theme.min.css'))
-    .on("error", sass.logError)
-    .pipe(minifyCSS())
-    .pipe(gulp.dest(CSSPATH))
-    done()
-})
+const JSPATH = `js/`;
+const CSSPATH = `css/`;
 
-const upload = file => {
-    console.log('Uploading:', file)
-    api.upload([
-        file
-    ]).then(res => {
+const FILES_TO_UPLOAD = [
+    `css/**/*`,
+    `js/**/*`,
+    `elements/**/*`,
+    `layouts/**/*`,
+    `pages/**/*`,
+    `configs/**/*`,
+    `img/**/*`,
+]
+
+const upload = files => {
+    console.log('Uploading:', files)
+    api.upload(files ? files.split(',') : null).then(res => {
         if(res.succeed) {
-            console.log(alert.green(`File ${file} has been uploaded`))
+            console.log(alert.green(`File ${files} has been uploaded`))
         }
         else {
             res.fails.forEach(fail => {
