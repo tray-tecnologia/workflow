@@ -15,6 +15,7 @@ var args = process.argv.join(' ')
     folder: (args.match(/--(folder|dir)(=|\s)?([\d\w\-]+)( --)?/)||[])[3] || '',
     tray_api_key: (args.match(/--key(=|\s)?([\d\w]+)( --)?/)||[])[2] || '',
     tray_api_password: (args.match(/--(password|pass)(=|\s)?([\d\w]+)( --)?/)||[])[3] || '',
+    tray_theme_id: (args.match(/--theme(=|\s)?([\d]+)( --)?/)||[])[2] || '',
     debug: false,
 });
 
