@@ -22,6 +22,7 @@ const PARAMS = {
 
     key: PARAMS.tray_api_key || process.env.TRAY_API_KEY,
     password: PARAMS.tray_api_password || process.env.TRAY_API_PASSWORD,
+    themeId: PARAMS.tray_theme_id || process.env.TRAY_THEME_ID,
     debug: false,
 });
 
