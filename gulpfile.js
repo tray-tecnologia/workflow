@@ -4,7 +4,6 @@ var gulp = require("gulp");
 var sass = require("gulp-sass")(require("sass"));
 var concat = require('gulp-concat');
 var minifyCSS = require('gulp-cssmin');
-var spawn = require('cross-spawn');
 var uglify = require('gulp-uglify');
 const alert = require('ansi-colors');
 
