@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+var fs = require('fs');
 var gulp = require("gulp");
 var sass = require("gulp-sass")(require("sass"));
 var concat = require('gulp-concat');
@@ -9,25 +10,90 @@ const alert = require('ansi-colors');
 
 const Tray = require('@tray-tecnologia/tray-cli').default;
 
-const api = new Tray({
-    key: process.env.TRAY_API_KEY,
-    password: process.env.TRAY_API_PASSWORD,
-    themeId: process.env.TRAY_THEME_ID,
-    debug: false,
-});
+var args = process.argv.join(' ')
 
-const JSPATH = './js/';
-const CSSPATH = './css/';
+const PARAMS = {
+    folder: (args.match(/--(folder|dir)(=|\s)?([\d\w\-]+)( --)?/)||[])[3] || '',
+    tray_api_key: (args.match(/--key(=|\s)?([\d\w]+)( --)?/)||[])[2] || '',
+    tray_api_password: (args.match(/--(password|pass)(=|\s)?([\d\w]+)( --)?/)||[])[3] || '',
+    tray_theme_id: (args.match(/--theme(=|\s)?([\d]+)( --)?/)||[])[2] || '',
+    file: (args.match(/--file(=|\s)?([\d\w\.\-\/]+)( --)?/)||[])[2] || '',
+}
+
+const CONFIG = {
+    key: PARAMS.tray_api_key || process.env.TRAY_API_KEY,
+    password: PARAMS.tray_api_password || process.env.TRAY_API_PASSWORD,
+    themeId: PARAMS.tray_theme_id || process.env.TRAY_THEME_ID,
+    debug: false,
+}
+
+const api = new Tray(CONFIG);
+
+const FOLDER = PARAMS.folder || `theme-${CONFIG.themeId}`
+
+if (!fs.existsSync(FOLDER)){
+    fs.mkdirSync(FOLDER);
+}
+
+process.chdir(FOLDER);
+
+const JSPATH = `js/`;
+const CSSPATH = `css/`;
 
 const FILES_TO_UPLOAD = [
-    './css/**/*',
-    './js/**/*',
-    './elements/**/*',
-    './layouts/**/*',
-    './pages/**/*',
-    './configs/**/*',
-    './img/**/*',
+    `css/**/*`,
+    `js/**/*`,
+    `elements/**/*`,
+    `layouts/**/*`,
+    `pages/**/*`,
+    `configs/**/*`,
+    `img/**/*`,
 ]
+
+const upload = files => {
+    console.log('Uploading:', files)
+    api.upload(files ? files.split(',') : null).then(res => {
+        if(res.succeed) {
+            console.log(alert.green(`File ${files} has been uploaded`))
+        }
+        else {
+            res.fails.forEach(fail => {
+                console.log(alert.red(`File ${fail.file} not uploaded ${fail.error}`))
+            })
+        }
+    })
+}
+
+const remove = files => {
+    console.log('Removing:', files)
+    api.remove(files.split(',')).then(res => {
+        if(res.succeed) {
+            console.log(alert.green(`File ${files} has been removed`, files))
+        }
+        else {
+            res.fails.forEach(fail => {
+                console.log(alert.red(`File ${fail.file} not removed ${fail.error}`))
+            })
+        }
+    })
+}
+
+const download = files => {
+    console.log(alert.green('Starting downloading theme files...', files))
+    api.download(files ? files.split(',') : null).then(res => {
+        console.log(res)
+        if(res.succeed) {
+            console.log(alert.green(`Done download files!`, files))
+        }
+        else {
+            res.fails.forEach(fail => {
+                console.log(alert.red(`Error download ${fail.file}: ${fail.error}`))
+            })
+        }
+    }).catch(err => {
+      console.log(alert.red(`An error occurred while downloading ${PARAMS.file}`))
+    })
+}
 
 gulp.task('js', (done) => {
     gulp.src(JSPATH + "modules/*.js")
@@ -36,7 +102,6 @@ gulp.task('js', (done) => {
     .pipe(gulp.dest(JSPATH));
     done()
 });
-
 
 gulp.task('sass', function(done) { 
     gulp
@@ -49,37 +114,15 @@ gulp.task('sass', function(done) {
     done()
 })
 
-const upload = file => {
-    console.log('Uploading:', file)
-    api.upload([
-        file
-    ]).then(res => {
-        if(res.succeed) {
-            console.log(alert.green(`File ${file} has been uploaded`))
-        }
-        else {
-            res.fails.forEach(fail => {
-                console.log(alert.red(`File ${fail.file} not uploaded ${fail.error}`))
-            })
-        }
-    })
-}
+gulp.task('upload', cb => {
+    upload(PARAMS.file)
+    cb()
+});
 
-const remove = file => {
-    console.log('Removing:', file)
-    api.remove([
-        file
-    ]).then(res => {
-        if(res.succeed) {
-            console.log(alert.green(`File ${file} has been removed`))
-        }
-        else {
-            res.fails.forEach(fail => {
-                console.log(alert.red(`File ${fail.file} not removed ${fail.error}`))
-            })
-        }
-    })
-}
+gulp.task('download', cb => {
+    download(PARAMS.file)
+    cb()
+});
 
 gulp.task('watch', () => {
     gulp.watch(FILES_TO_UPLOAD).on('change', upload);
@@ -87,21 +130,6 @@ gulp.task('watch', () => {
     gulp.watch(FILES_TO_UPLOAD).on('unlink', remove);
     gulp.watch(CSSPATH + 'sass/*', gulp.series('sass'));
     gulp.watch(JSPATH + 'modules/*.js', gulp.series('js'));
-});
-
-gulp.task('download', cb => {
-    console.log(alert.green('Starting downloading theme files...'))
-    api.download().then(res => {
-        if(res.succeed) {
-            console.log(alert.green(`Done download theme files!`))
-        }
-        else {
-            res.fails.forEach(fail => {
-                console.log(alert.red(`Error download ${fail.file}: ${fail.error}`))
-            })
-        }
-        cb();
-    }).catch(() => cb())
 });
 
 gulp.task('default', gulp.parallel('watch', 'sass','js' ));
