@@ -65,8 +65,25 @@ const upload = file => {
     })
 }
 
+const remove = file => {
+    console.log('Removing:', file)
+    api.remove([
+        file
+    ]).then(res => {
+        if(res.succeed) {
+            console.log(alert.green(`File ${file} has been removed`))
+        }
+        else {
+            res.fails.forEach(fail => {
+                console.log(alert.red(`File ${fail.file} not removed ${fail.error}`))
+            })
+        }
+    })
+}
+
 gulp.task('watch', () => {
     gulp.watch(FILES_TO_UPLOAD).on('change', upload);
+    gulp.watch(FILES_TO_UPLOAD).on('unlink', remove);
     gulp.watch(CSSPATH + 'sass/*', gulp.series('sass'));
     gulp.watch(JSPATH + 'modules/*.js', gulp.series('js'));
 });
