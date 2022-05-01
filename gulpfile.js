@@ -12,6 +12,7 @@ const Tray = require('@tray-tecnologia/tray-cli').default;
 
 var args = process.argv.join(' ')
 
+    folder: (args.match(/--(folder|dir)(=|\s)?([\d\w\-]+)( --)?/)||[])[3] || '',
     debug: false,
 });
 
