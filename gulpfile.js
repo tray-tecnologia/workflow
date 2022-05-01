@@ -35,6 +35,7 @@ if (!fs.existsSync(FOLDER)){
     fs.mkdirSync(FOLDER);
 }
 
+process.chdir(FOLDER);
 
 gulp.task('sass', function(done) { 
     gulp
