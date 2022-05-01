@@ -10,10 +10,12 @@ const alert = require('ansi-colors');
 
 const Tray = require('@tray-tecnologia/tray-cli').default;
 
-    if (arg == '--folder' && nextArg) {
-        FOLDER = process.cwd() + '/' + nextArg;
-    }
-}
+const api = new Tray({
+    key: process.env.TRAY_API_KEY,
+    password: process.env.TRAY_API_PASSWORD,
+    themeId: process.env.TRAY_THEME_ID,
+    debug: false,
+});
 
 const JSPATH = FOLDER + '/js/';
 const CSSPATH = FOLDER + '/css/';
