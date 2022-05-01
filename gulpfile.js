@@ -18,6 +18,7 @@ const api = new Tray({
 });
 
 const JSPATH = './js/';
+const CSSPATH = './css/';
 
 
 gulp.task('js', (done) => {
