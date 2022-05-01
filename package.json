@@ -1,16 +1,17 @@
 {
   "name": "opencode-workflow",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "gulpfile.js",
   "dependencies": {
+    "@tray-tecnologia/tray-cli": "^1.0.0",
     "ansi-colors": "^4.1.1",
-    "cross-spawn": "^7.0.3",
-    "gulp": "4.0.2",
-    "gulp-concat": "2.6.1",
-    "gulp-cssmin": "0.2.0",
-    "gulp-exec": "5.0.0",
-    "gulp-sass": "4.1.0",
-    "gulp-uglify": "^3.0.2"
+    "dotenv": "^16.0.0",
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-cssmin": "^0.2.0",
+    "gulp-sass": "^5.1.0",
+    "gulp-uglify": "^3.0.2",
+    "sass": "^1.51.0"
   },
   "config": {
     "unsafe-perm": true

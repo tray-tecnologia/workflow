@@ -1,24 +1,33 @@
+require('dotenv').config();
+
 var gulp = require("gulp");
-var sass = require("gulp-sass");
+var sass = require("gulp-sass")(require("sass"));
 var concat = require('gulp-concat');
 var minifyCSS = require('gulp-cssmin');
-var spawn = require('cross-spawn');
 var uglify = require('gulp-uglify');
 const alert = require('ansi-colors');
 
-var FOLDER;
-for (var i = process.argv.length; i > 0; i--) {
-    var arg = process.argv[i];
-    var nextArg = process.argv[i + 1];
+const Tray = require('@tray-tecnologia/tray-cli').default;
 
-    if (arg == '--folder' && nextArg) {
-        FOLDER = process.cwd() + '/' + nextArg;
-    }
-}
+const api = new Tray({
+    key: process.env.TRAY_API_KEY,
+    password: process.env.TRAY_API_PASSWORD,
+    themeId: process.env.TRAY_THEME_ID,
+    debug: false,
+});
 
-const JSPATH = FOLDER + '/js/';
-const CSSPATH = FOLDER + '/css/';
+const JSPATH = './js/';
+const CSSPATH = './css/';
 
+const FILES_TO_UPLOAD = [
+    './css/**/*',
+    './js/**/*',
+    './elements/**/*',
+    './layouts/**/*',
+    './pages/**/*',
+    './configs/**/*',
+    './img/**/*',
+]
 
 gulp.task('js', (done) => {
     gulp.src(JSPATH + "modules/*.js")
@@ -40,27 +49,41 @@ gulp.task('sass', function(done) {
     done()
 })
 
-gulp.task('opencode', () => {
-    process.chdir(FOLDER);
-
-    var opencode = spawn('opencode', ['watch']);
-
-    opencode.stdout.on('data', (data) => {
-        var output = alert.green(data);
-        if (data.indexOf('Error') > -1) {
-            output = alert.red(data);
+const upload = file => {
+    console.log('Uploading:', file)
+    api.upload([
+        file
+    ]).then(res => {
+        if(res.succeed) {
+            console.log(alert.green(`File ${file} has been uploaded`))
         }
-        process.stdout.write(output);
-    });
-
-    opencode.stderr.on('data', (data) => {
-        process.stdout.write(alert.red(data));
-    });
-});
+        else {
+            res.fails.forEach(fail => {
+                console.log(alert.red(`File ${fail.file} not uploaded ${fail.error}`))
+            })
+        }
+    })
+}
 
 gulp.task('watch', () => {
+    gulp.watch(FILES_TO_UPLOAD).on('change', upload);
     gulp.watch(CSSPATH + 'sass/*', gulp.series('sass'));
     gulp.watch(JSPATH + 'modules/*.js', gulp.series('js'));
 });
 
-gulp.task('default', gulp.parallel('watch', 'opencode', 'sass','js' ));
+gulp.task('download', cb => {
+    console.log(alert.green('Starting downloading theme files...'))
+    api.download().then(res => {
+        if(res.succeed) {
+            console.log(alert.green(`Done download theme files!`))
+        }
+        else {
+            res.fails.forEach(fail => {
+                console.log(alert.red(`Error download ${fail.file}: ${fail.error}`))
+            })
+        }
+        cb();
+    }).catch(() => cb())
+});
+
+gulp.task('default', gulp.parallel('watch', 'sass','js' ));
