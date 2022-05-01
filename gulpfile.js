@@ -31,13 +31,9 @@ const api = new Tray(CONFIG);
 
 const FOLDER = PARAMS.folder || `theme-${CONFIG.themeId}`
 
-gulp.task('js', (done) => {
-    gulp.src(JSPATH + "modules/*.js")
-    .pipe(concat("theme.min.js"))
-    .pipe(uglify({"compress": false}))
-    .pipe(gulp.dest(JSPATH));
-    done()
-});
+if (!fs.existsSync(FOLDER)){
+    fs.mkdirSync(FOLDER);
+}
 
 
 gulp.task('sass', function(done) { 
