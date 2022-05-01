@@ -8,10 +8,7 @@ var spawn = require('cross-spawn');
 var uglify = require('gulp-uglify');
 const alert = require('ansi-colors');
 
-var FOLDER;
-for (var i = process.argv.length; i > 0; i--) {
-    var arg = process.argv[i];
-    var nextArg = process.argv[i + 1];
+const Tray = require('@tray-tecnologia/tray-cli').default;
 
     if (arg == '--folder' && nextArg) {
         FOLDER = process.cwd() + '/' + nextArg;
