@@ -6,7 +6,7 @@ Workflow para desenvolvimento de temas utilizando Tray CLI.
 
 Pré-requisitos: NodeJS, NPM e GULP
 
-Clone o repositório e acesse o ditório com os arquivos baixados.
+Clone o repositório e acesse o diretório com os arquivos baixados.
 
 Depois execute o comando:
 
