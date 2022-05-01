@@ -20,14 +20,14 @@ const PARAMS = {
     file: (args.match(/--file(=|\s)?([\d\w\.\-\/]+)( --)?/)||[])[2] || '',
 }
 
+const CONFIG = {
     key: PARAMS.tray_api_key || process.env.TRAY_API_KEY,
     password: PARAMS.tray_api_password || process.env.TRAY_API_PASSWORD,
     themeId: PARAMS.tray_theme_id || process.env.TRAY_THEME_ID,
     debug: false,
-});
+}
 
-const JSPATH = './js/';
-const CSSPATH = './css/';
+const api = new Tray(CONFIG);
 
 const FILES_TO_UPLOAD = [
     './css/**/*',
