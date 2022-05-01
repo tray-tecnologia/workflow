@@ -64,13 +64,11 @@ const upload = file => {
     })
 }
 
-const remove = file => {
-    console.log('Removing:', file)
-    api.remove([
-        file
-    ]).then(res => {
+const remove = files => {
+    console.log('Removing:', files)
+    api.remove(files.split(',')).then(res => {
         if(res.succeed) {
-            console.log(alert.green(`File ${file} has been removed`))
+            console.log(alert.green(`File ${files} has been removed`, files))
         }
         else {
             res.fails.forEach(fail => {
@@ -80,27 +78,58 @@ const remove = file => {
     })
 }
 
-gulp.task('watch', () => {
-    gulp.watch(FILES_TO_UPLOAD).on('change', upload);
-    gulp.watch(FILES_TO_UPLOAD).on('add', upload);
-    gulp.watch(FILES_TO_UPLOAD).on('unlink', remove);
-    gulp.watch(CSSPATH + 'sass/*', gulp.series('sass'));
-    gulp.watch(JSPATH + 'modules/*.js', gulp.series('js'));
-});
-
-gulp.task('download', cb => {
-    console.log(alert.green('Starting downloading theme files...'))
-    api.download().then(res => {
+const download = files => {
+    console.log(alert.green('Starting downloading theme files...', files))
+    api.download(files ? files.split(',') : null).then(res => {
+        console.log(res)
         if(res.succeed) {
-            console.log(alert.green(`Done download theme files!`))
+            console.log(alert.green(`Done download files!`, files))
         }
         else {
             res.fails.forEach(fail => {
                 console.log(alert.red(`Error download ${fail.file}: ${fail.error}`))
             })
         }
-        cb();
-    }).catch(() => cb())
+    }).catch(err => {
+      console.log(alert.red(`An error occurred while downloading ${PARAMS.file}`))
+    })
+}
+
+gulp.task('js', (done) => {
+    gulp.src(JSPATH + "modules/*.js")
+    .pipe(concat("theme.min.js"))
+    .pipe(uglify({"compress": false}))
+    .pipe(gulp.dest(JSPATH));
+    done()
+});
+
+gulp.task('sass', function(done) { 
+    gulp
+    .src(CSSPATH + 'sass/theme.min.scss')
+    .pipe(sass())
+    .pipe(concat('theme.min.css'))
+    .on("error", sass.logError)
+    .pipe(minifyCSS())
+    .pipe(gulp.dest(CSSPATH))
+    done()
+})
+
+gulp.task('upload', cb => {
+    upload(PARAMS.file)
+    cb()
+});
+
+gulp.task('download', cb => {
+    download(PARAMS.file)
+    cb()
+});
+
+gulp.task('watch', () => {
+    gulp.watch(FILES_TO_UPLOAD).on('change', upload);
+    gulp.watch(FILES_TO_UPLOAD).on('add', upload);
+    gulp.watch(FILES_TO_UPLOAD).on('unlink', remove);
+    gulp.watch(CSSPATH + 'sass/*', gulp.series('sass'));
+    gulp.watch(JSPATH + 'modules/*.js', gulp.series('js'));
 });
 
 gulp.task('default', gulp.parallel('watch', 'sass','js' ));
