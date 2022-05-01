@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 var gulp = require("gulp");
-var sass = require("gulp-sass");
+var sass = require("gulp-sass")(require("sass"));
 var concat = require('gulp-concat');
 var minifyCSS = require('gulp-cssmin');
 var spawn = require('cross-spawn');
